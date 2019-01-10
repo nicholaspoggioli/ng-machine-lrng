@@ -34,7 +34,7 @@ The function **h** is referred to as the **hypothesis function** that maps the f
 
 A linear regression hypothesis function can be represented as 
 
-$$ h_{0}(x)=\theta_{0} + \theta_{1}(x) $$
+$$h_{0}(x)=\theta_{0} + \theta_{1}(x)$$
 
 A **central problem in machine learning** is how to represent the function **h**.
 
@@ -113,6 +113,124 @@ Special matrix operations
 If A is an m x m matrix, and if it has an inverse, then $A(A^{-1})=(A^{-1})A=I$.
 
 The transpose of a matrix is each row of a matrix turned into a column of its transpose. If A is an m x n matrix, and B is the transpose of A, then B is an n x m matrix in which $B_{ij}=A_{ji}$.
+
+
+## Linear Regression with Multiple Variables
+
+### Multivariate linear regression
+Our previous hypothesis was $h_{0}(x)=\theta_{0}+\theta_{1}x$
+
+Now, with multiple variables, the hypothesis is $$h_{0}(x) = \theta_{0}x{0} + \theta_{1}x_{1}+\theta_{2}x_{2}+ ... + \theta_{n}x_{n}$$ where $\x_{0} is a vector of 1s and $n$ is the number of variables or features.
+
+#### Gradient descent for multiple variables
+How to use gradient descent for linear regression with multiple variables?
+
+There is now a simultaneous updating algorithm for each feature.
+
+Repeat until convergence: $$\theta_{0}:=\theta_{0}-\alpha\frac{1}{m}\sum_{i = 1}^{m}(h_{\theta}(x^{i})-y^{i})x_{0}^{i}$$ $$\theta_{1}:=\theta_{0}-\alpha\frac{1}{m}\sum_{i = 1}^{m}(h_{\theta}(x^{i})-y^{i})x_{1}^{i}$$ $$...$$ $$\theta_{n}:=\theta_{0}-\alpha\frac{1}{m}\sum_{i = 1}^{m}(h_{\theta}(x^{i})-y^{i})x_{n}^{i}$$
+
+#### Gradient descent in practice: Feature scaling
+Feature scaling ensures all the features are on a similar scale. Gradient descent converges more quickly when features are scaled.
+
+Often we want to scale all features to be as close as possible to the range $$-1 \le x_{i} \ge 1$$.
+
+Approaches
+
+- Divide each feature by the maximum value of that feature
+- **Mean normalization**: replace $x_{i}$ with $x_{i} - \mu_{i}$ to make features have approximately zero mean.
+- **Standardization**: replace each variable with the value minus the mean divided by standard deviation or the range of the variable.
+
+#### Gradient descent in practice: Learning rate
+The learning rate in the gradient descent update rules is $\alpha$.
+
+The job of gradient descent is to find the value of $\theta$ that minimizes the cost function $J(\theta)$.
+
+One useful thing is to plot $J(\theta)$ against the number of iterations. If gradient descent is working properly, $J(\theta)$ should decrease as the number of iterations increases. The plot also tells you where the decline flattens out and doing more iterations has diminishing returns.
+
+If the plot shows $J(\theta)$ is not decreasing, it's likely the learning rate is off. Usually a smaller learning rate will be better. 
+
+However, if the learning rate is too small, gradient descent can be very slow to converge.
+
+To choose the learning rate, start with 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, and 1, and plot the resulting change in $J(\theta)$ against interation number.
+
+### Computing Parameters Analytically
+
+#### Normal equation
+For some linear regression, the normal equation will be the best for estimating the parameters. Rather than use gradient descent to solve for $\theta$, the normal equation solves for $\theta$ analytically.
+
+The normal equation is $$\theta = (X^{T}X)^{-1}X^{T}y$$
+
+The normal equation differs from gradient descent in the following ways:
+
+1. Do not need to choose a learning rate
+2. Does not need to iterate
+3. Needs to compute $(X^{T}X)$
+4. Slower when number of variables is large
+
+One rule of thumb is to use gradient descent when number of features > 10,000.
+
+#### Normal equation when the $(X^{T}X)$ matrix is non-invertible
+Some matrices cannot be inverted. Such matrices are "singular" or "degenerate".
+
+Two most common causes of non-invertibility:
+
+1. Redudant featuers (linearly dependent features)
+2. Too many features (number of observations less than number of features)
+
+To address (2), delete some features, and/or use regularization.
+
+### Octave tutorial
+
+**Loops**
+for i=1:10,
+  v(i) = 2^i;
+end;
+
+i = 1;
+while i <= 5,
+  v(i) = 100;
+  i = i+1;
+end;
+
+i=1;
+while true,
+  v(i) = 999;
+  i = i+1;
+  if i == 6,
+    break;
+  end;
+end;
+
+**Functions**
+The cost function J($\theta$) can be written as an Octave function:
+
+function J = costFunctionJ(X, y, theta)
+
+% X is the "design matrix" containing training data.
+% y is the class labels.
+
+m = size(X,1);          % number of training examples
+predictions = X*theta;  % predictions of hypothesis on all m examples
+sqrErrors = (predictions-y).^2;     % squared errors
+
+J = 1/(2*m) * sum(sqrErrors);
+
+**Vectorization**
+Coding using vector operations rather than iterations.
+
+Example of gradient descent simultaneous updating for two features.
+
+Non-vectorized would have a for-loop for each parameter.
+
+A vectorized approach combines all three simultaneous update equations into a single vectorized operation.
+
+
+
+
+
+
+
+
 
 
 
